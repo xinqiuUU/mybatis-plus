@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="js/axios.js"></script>
+    <script src="js/vue.js"></script>
+
+</head>
+<body>
+<div id="app">
+    <a href="http://127.0.0.1:8161/" style="margin-right: 50px"> activemq 控制台  </a>
+    <a href="/druid"> 数据库控制台</a>
+    </br>
+    <input placeholder="账户" v-model="accountId" > 账户  <br>
+    <input placeholder="余额" v-model="money">       余额 <br>
+    <input placeholder="转入账户" v-model="toAccountId"> 转入账户<br>
+    <p></p>
+
+    <button @click="openAccount">开户</button>
+    <button @click="queryAccount">查询</button>
+    <button @click="deposite">存款</button>
+    <button @click="withdraw"> 取款</button>
+    <button @click="transfer">转账</button>
+
+    <p>账户:{{account.accountid}}</p>
+    <p>余额:{{account.balance}}</p>
+    <p>邮箱:{{account.email}}</p>
+</div>
+<script>
+    var app = new Vue({
+        el: '#app',
+        data: {
+            accountId: '',
+            money: '',
+            toAccountId: '',
+            account: {accountid: '', balance: '', email: '',}, // 初始化
+        }, methods: {
+            // 开户
+            openAccount() {
+                var params = new URLSearchParams();
+                params.append("balance", this.money);
+                axios.post('account/openAccount', params)
+                    .then(result => {
+                        let jm = result.data;
+                        if (jm) {
+                            this.account = jm;
+                        }
+                    });
+            },
+            // 查询
+            queryAccount() {
+                axios.get('account/findAccount', {
+                    params: {
+                        accountid: this.accountId
+                    }
+                })
+                    .then(result => {
+                        let jm = result.data;
+                        if (jm) {
+                            this.account = jm;
+                        }
+                    });
+            },
+            // 存款
+            deposite() {
+                axios.put('/account/deposit', {
+                    accountid: this.accountId,
+                    balance: this.money
+                }, {
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                    .then(result => {
+                        let jm = result.data;
+                        if (jm) {
+                            this.account = jm;
+                        }
+                    });
+            },
+            // 取款
+            withdraw() {
+                axios.put('/account/withdraw', {
+                    accountid: this.accountId,
+                    balance: this.money
+                }, {
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                    .then(result => {
+                        let jm = result.data;
+                        if (jm) {
+                            this.account = jm;
+                        }
+                    });
+            },
+            // 转账
+            transfer() {
+                axios.put('/account/transfer', {
+                    fromid: this.accountId,
+                    balance: this.money,
+                    toid: this.toAccountId
+                }, {
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                    .then(result => {
+                        let jm = result.data;
+                        if (jm) {
+                            this.account = jm;
+                        }
+                    });
+            },
+
+        },
+    })
+</script>
+</body>
+</html>
